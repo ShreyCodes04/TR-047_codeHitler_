@@ -99,17 +99,28 @@ async def generate_report(
         # Common misconfig: missing key/env. Return 400 so the UI can display a clear fix.
         msg = str(exc)
         logger.exception("LLM report generation failed (runtime)")
-        if "Missing GOOGLE_API_KEY or GEMINI_API_KEY" in msg:
+        if (
+            "Missing GOOGLE_API_KEY or GEMINI_API_KEY" in msg
+            or "Missing GROQ_API_KEY" in msg
+            or "Missing GROQ_API_KEY or GOOGLE_API_KEY or GEMINI_API_KEY" in msg
+        ):
             raise HTTPException(
                 status_code=400,
-                detail="Missing GEMINI_API_KEY (or GOOGLE_API_KEY). Set it in backend/.env or export it, then restart the server.",
+                detail="Missing LLM API key. Set GROQ_API_KEY, or GEMINI_API_KEY/GOOGLE_API_KEY in backend/.env, then restart the server.",
             ) from exc
         raise HTTPException(status_code=502, detail=f"LLM runtime error: {msg}") from exc
     except Exception as exc:
         logger.exception("LLM report generation failed")
+        error_type = type(exc).__name__
+        detail = f"LLM report generation failed: {error_type}. Check server logs for details."
+        if error_type == "ResourceExhausted":
+            detail = (
+                "Gemini quota or model capacity was exhausted. Try again in a minute, "
+                "use a different API key/project with available quota, or reduce the report size."
+            )
         raise HTTPException(
-            status_code=502,
-            detail=f"LLM report generation failed: {type(exc).__name__}. Check server logs for details.",
+            status_code=429 if error_type == "ResourceExhausted" else 502,
+            detail=detail,
         ) from exc
 
     # 6) Return JSON

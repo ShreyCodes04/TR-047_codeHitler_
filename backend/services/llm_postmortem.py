@@ -116,6 +116,46 @@ def generate_sre_postmortem(inputs: LLMInputs) -> dict[str, Any]:
 
 
 def _build_llm():
+    provider = settings.llm_provider
+    if provider not in {"auto", "groq", "gemini"}:
+        provider = "auto"
+
+    if provider == "groq":
+        return _build_groq_llm()
+    if provider == "gemini":
+        return _build_gemini_llm()
+
+    if settings.groq_api_key:
+        return _build_groq_llm()
+    if settings.google_api_key or settings.gemini_api_key:
+        return _build_gemini_llm()
+
+    raise RuntimeError(
+        "Missing GROQ_API_KEY or GOOGLE_API_KEY or GEMINI_API_KEY in environment."
+    )
+
+
+def _build_groq_llm():
+    if not settings.groq_api_key:
+        raise RuntimeError("Missing GROQ_API_KEY in environment.")
+
+    try:
+        from langchain_groq import ChatGroq
+    except Exception as exc:  # pragma: no cover
+        raise RuntimeError(
+            "langchain-groq is not installed. Add it to requirements and install deps."
+        ) from exc
+
+    return ChatGroq(
+        model=settings.groq_model,
+        api_key=settings.groq_api_key,
+        temperature=0,
+        max_retries=2,
+        timeout=float(settings.llm_timeout_seconds),
+    )
+
+
+def _build_gemini_llm():
     api_key = settings.google_api_key or settings.gemini_api_key
     if not api_key:
         raise RuntimeError("Missing GOOGLE_API_KEY or GEMINI_API_KEY in environment.")
@@ -127,7 +167,6 @@ def _build_llm():
             "langchain-google-genai is not installed. Add it to requirements and install deps."
         ) from exc
 
-    # Deterministic settings.
     return ChatGoogleGenerativeAI(
         model=settings.gemini_model,
         api_key=api_key,

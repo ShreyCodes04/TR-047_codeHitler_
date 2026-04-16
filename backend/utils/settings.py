@@ -44,12 +44,17 @@ class Settings:
     max_total_bytes: int
     chunk_size: int
     cors_origins: list[str]
+    llm_provider: str
+    groq_api_key: str
+    groq_model: str
     google_api_key: str
     gemini_api_key: str
     gemini_model: str
     llm_timeout_seconds: int
     llm_max_events: int
     llm_max_logs_per_event: int
+    jwt_secret: str
+    jwt_exp_minutes: int
 
 
 settings = Settings(
@@ -61,12 +66,22 @@ settings = Settings(
     chunk_size=_parse_int(os.getenv("UPLOAD_CHUNK_SIZE"), 1024 * 1024),
     cors_origins=_parse_csv(
         os.getenv("CORS_ORIGINS"),
-        ["http://localhost:3000", "http://127.0.0.1:3000"],
+        [
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://localhost:3001",
+            "http://127.0.0.1:3001",
+        ],
     ),
+    llm_provider=os.getenv("LLM_PROVIDER", "auto").strip().lower(),
+    groq_api_key=os.getenv("GROQ_API_KEY", ""),
+    groq_model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
     google_api_key=os.getenv("GOOGLE_API_KEY", ""),
     gemini_api_key=os.getenv("GEMINI_API_KEY", ""),
     gemini_model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
     llm_timeout_seconds=_parse_int(os.getenv("LLM_TIMEOUT_SECONDS"), 60),
-    llm_max_events=_parse_int(os.getenv("LLM_MAX_EVENTS"), 60),
-    llm_max_logs_per_event=_parse_int(os.getenv("LLM_MAX_LOGS_PER_EVENT"), 6),
+    llm_max_events=_parse_int(os.getenv("LLM_MAX_EVENTS"), 30),
+    llm_max_logs_per_event=_parse_int(os.getenv("LLM_MAX_LOGS_PER_EVENT"), 4),
+    jwt_secret=os.getenv("JWT_SECRET", "dev-secret-change-me"),
+    jwt_exp_minutes=_parse_int(os.getenv("JWT_EXP_MINUTES"), 60 * 24 * 7),
 )
