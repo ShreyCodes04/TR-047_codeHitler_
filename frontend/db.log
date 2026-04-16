@@ -1,0 +1,5 @@
+2026-04-16 09:13:57 LOG connection received: host=10.4.2.18 port=54421
+2026-04-16 09:15:48 ERROR statement timeout: duration=30001 ms statement="select * from inventory where warehouse_id = 17 order by updated_at desc"
+2026-04-16 09:16:18 FATAL remaining connection slots are reserved for superusers
+2026-04-16 09:17:02 LOG process 8821 still waiting for ShareLock on transaction 229911
+2026-04-16 09:23:51 LOG checkpoint complete

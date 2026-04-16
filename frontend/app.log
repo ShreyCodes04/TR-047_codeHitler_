@@ -1,0 +1,5 @@
+2026-04-16 09:14:03 INFO api-gateway request_id=8fd1 route=/checkout latency_ms=842 upstream=checkout-service
+2026-04-16 09:14:09 WARN checkout-service request_id=8fd1 queue_depth=148 retrying inventory lookup
+2026-04-16 09:15:12 ERROR checkout-service request_id=8fd1 status=500 message="inventory lookup timeout"
+2026-04-16 09:16:44 ERROR checkout-service request_id=91aa status=500 message="database pool exhausted"
+2026-04-16 09:24:12 INFO checkout-service recovery="manual db pool reset applied"

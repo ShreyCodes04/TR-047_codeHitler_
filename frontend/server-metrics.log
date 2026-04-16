@@ -1,0 +1,5 @@
+2026-04-16 09:14:20 node=worker-2 cpu=91% memory=78% pod_restarts=0
+2026-04-16 09:16:05 node=worker-2 cpu=97% memory=83% hpa_desired=6 hpa_current=3
+2026-04-16 09:18:41 node=worker-2 cpu=95% memory=84% error_rate=18% scale_up_lag=160s
+2026-04-16 09:21:07 node=worker-2 cpu=68% memory=70% hpa_desired=6 hpa_current=6
+2026-04-16 09:24:30 node=worker-2 cpu=44% memory=58% error_rate=1.2%

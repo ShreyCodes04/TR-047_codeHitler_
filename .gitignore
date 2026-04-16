@@ -1,0 +1,33 @@
+.DS_Store
+
+# Archives
+*.zip
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Environment files (never commit secrets)
+.env
+.env.*
+backend/.env
+frontend/.env.local
+
+# If a nested repo existed previously
+frontend/.git_backup/
+
+# Local logs (optional)
+pip-log.txt
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
