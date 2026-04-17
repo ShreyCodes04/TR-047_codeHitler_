@@ -75,6 +75,8 @@ Optional: set a custom backend URL for the frontend by creating `frontend/.env.l
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 ```
 
+You can also copy `frontend/.env.example` and update it for local development.
+
 ## Run
 
 ### Terminal 1: Backend
@@ -142,6 +144,80 @@ curl -X POST http://localhost:8000/generate-report \
 - Verify `http://localhost:8000/health`.
 - If your frontend runs on `127.0.0.1:3000`, that origin is allowed by default CORS.
 
+## Deploy Frontend To Vercel
+
+This frontend is a standard Next.js app in `frontend/`, so Vercel can deploy it directly.
+
+### Before deploying
+
+1. Confirm your Render backend URL works:
+   - Example: `https://your-render-service.onrender.com/health`
+   - It should return `{ "status": "ok" }`
+2. In Render, add/update `CORS_ORIGINS` so your Vercel site is allowed.
+   - Example value:
+
+```env
+CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://your-project.vercel.app
+```
+
+If you later connect a custom domain, add that too:
+
+```env
+CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://your-project.vercel.app,https://yourdomain.com
+```
+
+3. Redeploy the Render backend after changing backend environment variables.
+
+### Vercel project settings
+
+When importing the repo into Vercel, use:
+
+- Framework Preset: `Next.js`
+- Root Directory: `frontend`
+- Build Command: `npm run build`
+- Output Directory: leave default
+- Install Command: `npm install`
+
+### Vercel environment variables
+
+Add these in Vercel Project Settings -> Environment Variables:
+
+```env
+NEXT_PUBLIC_API_BASE_URL=https://your-render-service.onrender.com
+```
+
+Optional:
+
+```env
+NEXT_PUBLIC_SPLINE_SCENE_URL=https://prod.spline.design/your-scene-url/scene.splinecode
+```
+
+### Step-by-step deployment
+
+1. Push the repository to GitHub.
+2. Log in to Vercel.
+3. Click `Add New...` -> `Project`.
+4. Import your GitHub repository.
+5. Set the root directory to `frontend`.
+6. Verify Vercel detected `Next.js`.
+7. Add `NEXT_PUBLIC_API_BASE_URL` with your Render backend URL.
+8. Click `Deploy`.
+9. After deployment finishes, open the Vercel URL.
+10. Test:
+   - `/`
+   - `/login`
+   - `/dashboard`
+   - login/register flow
+   - report generation flow
+
+### If the frontend loads but API calls fail
+
+Check these in order:
+
+1. `NEXT_PUBLIC_API_BASE_URL` in Vercel points to the Render backend base URL with no trailing slash.
+2. Render backend has `CORS_ORIGINS` including the exact Vercel domain.
+3. Render backend is healthy at `/health`.
+4. Your backend secrets like `GEMINI_API_KEY` or `GROQ_API_KEY` are still set in Render.
+
 ### Python / Google SDK warnings
 If you see warnings about Python 3.9 being EOL, upgrading to Python 3.10+ will reduce these and improve compatibility long-term.
-
